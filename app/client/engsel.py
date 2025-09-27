@@ -253,6 +253,7 @@ def get_balance(api_key: str, id_token: str) -> dict:
     
     print("Fetching balance...")
     res = send_api_request(api_key, path, raw_payload, id_token, "POST")
+    # print(f"[GB-256]:\n{json.dumps(res, indent=2)}")
     
     if "data" in res:
         if "balance" in res["data"]:
@@ -618,7 +619,7 @@ def get_package_details(
     api_key: str,
     tokens: dict,
     family_code: str,
-    variant_name: str,
+    variant_code: str,
     option_order: int,
     is_enterprise: bool,
     migration_type: str = "NONE"
@@ -633,23 +634,14 @@ def get_package_details(
     package_variants = family_data["package_variants"]
     option_code = None
     for variant in package_variants:
-
-        # if clean_text(variant["name"]) == variant_name:
-        #     selected_variant = variant
-            
-        #     package_options = selected_variant["package_options"]
-        #     for option in package_options:
-        #         if option["order"] == option_order:
-        #             selected_option = option
-        #             option_code = selected_option["package_option_code"]
-        #             break
-        package_options.extend(variant["package_options"])
-    
-    for option in package_options:
-        if option["order"] == option_order:
-            selected_option = option
-            option_code = selected_option["package_option_code"]
-            break
+        if variant["package_variant_code"] == variant_code:
+            selected_variant = variant
+            package_options = selected_variant["package_options"]
+            for option in package_options:
+                if option["order"] == option_order:
+                    selected_option = option
+                    option_code = selected_option["package_option_code"]
+                    break
 
     if option_code is None:
         print("Gagal menemukan opsi paket yang sesuai.")

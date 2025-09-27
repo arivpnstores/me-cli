@@ -1,3 +1,4 @@
+import json
 import sys
 from app.service.auth import AuthInstance
 from app.client.engsel import get_family, get_package, get_addons, purchase_package, send_api_request
@@ -7,6 +8,7 @@ from app.client.ewallet import show_multipayment
 from app.menus.util import clear_screen, pause, display_html
 from app.client.qris import show_qris_payment_v2
 from app.client.ewallet import show_multipayment_v2
+from app.client.balance import settlement_balance
 from app.type_dict import PaymentItem
 
 
@@ -21,19 +23,17 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         print("Failed to load package details.")
         pause()
         return False
-    variant_name = package.get("package_detail_variant", "").get("name","") #For Xtra Combo
+
     price = package["package_option"]["price"]
     detail = display_html(package["package_option"]["tnc"])
     validity = package["package_option"]["validity"]
 
     option_name = package.get("package_option", {}).get("name","") #Vidio
     family_name = package.get("package_family", {}).get("name","") #Unlimited Turbo
+    variant_name = package.get("package_detail_variant", "").get("name","") #For Xtra Combo
+    option_name = package.get("package_option", {}).get("name","") #Vidio
     
-    title = f"{family_name} {variant_name} {option_name}".strip()
-    
-    # variant_name = package_details_data["package_detail_variant"].get("name", "")
-    # option_name = package_details_data["package_option"].get("name", "")
-    item_name = f"{variant_name} {option_name}".strip()
+    title = f"{family_name} - {variant_name} - {option_name}".strip()
     
     token_confirmation = package["token_confirmation"]
     ts_to_sign = package["timestamp"]
@@ -43,6 +43,8 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
     print(f"Nama: {title}")
     print(f"Harga: Rp {price}")
     print(f"Masa Aktif: {validity}")
+    print(f"Point: {package['package_option']['point']}")
+    print(f"Plan Type: {package['package_family']['plan_type']}")
     print("-------------------------------------------------------")
     benefits = package["package_option"]["benefits"]
     if benefits and isinstance(benefits, list):
@@ -50,9 +52,12 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         for benefit in benefits:
             print("-------------------------------------------------------")
             print(f" Name: {benefit['name']}")
-            if "Call" in benefit['name']:
+            data_type = benefit['data_type']
+            if data_type == "VOICE" and benefit['total'] > 0:
                 print(f"  Total: {benefit['total']/60} menit")
-            else:
+            elif data_type == "TEXT" and benefit['total'] > 0:
+                print(f"  Total: {benefit['total']} SMS")
+            elif data_type == "DATA" and benefit['total'] > 0:
                 if benefit['total'] > 0:
                     quota = int(benefit['total'])
                     # It is in byte, make it in GB
@@ -67,9 +72,14 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
                         print(f"  Quota: {quota_kb:.2f} KB")
                     else:
                         print(f"  Total: {quota}")
+            elif data_type not in ["DATA", "VOICE", "TEXT"]:
+                print(f"  Total: {benefit['total']} ({data_type})")
+            
+            if benefit["is_unlimited"]:
+                print("  Unlimited: Yes")
     print("-------------------------------------------------------")
-    # addons = get_addons(api_key, tokens, package_option_code)
-    # print(f"Addons:\n{json.dumps(addons, indent=2)}")
+    addons = get_addons(api_key, tokens, package_option_code)
+    print(f"Addons:\n{json.dumps(addons, indent=2)}")
     print("-------------------------------------------------------")
     print(f"SnK MyXL:\n{detail}")
     print("-------------------------------------------------------")
@@ -109,7 +119,20 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
             continue
         
         if choice == '1':
-            purchase_package(api_key, tokens, package_option_code, is_enterprise)
+            # purchase_package(api_key, tokens, package_option_code, is_enterprise)
+            settlement_balance(
+                api_key,
+                tokens,
+                [PaymentItem(
+                    item_code=package_option_code,
+                    product_type="",
+                    item_price=price,
+                    item_name=option_name,
+                    tax=0,
+                    token_confirmation=token_confirmation,
+                )],
+                ask_overwrite=True
+            )
             input("Silahkan cek hasil pembelian di aplikasi MyXL. Tekan Enter untuk kembali.")
             return True
         elif choice == '2':
@@ -182,12 +205,15 @@ def get_packages_by_family(
     in_package_menu = True
     while in_package_menu:
         clear_screen()
+        print("-------------------------------------------------------")        
+        print(f"Family Name: {data['package_family']['name']}")
+        print(f"Family Code: {family_code}")
+        print(f"Family Type: {data['package_family']['package_family_type']}")
+        print(f"Enterprise: {'Yes' if is_enterprise else 'No'}")
+        print(f"Variant Count: {len(data['package_variants'])}")
         print("-------------------------------------------------------")
         print("Paket Tersedia")
         print("-------------------------------------------------------")
-        
-        family_name = data['package_family']["name"]
-        print(f"Family Name: {family_name}")
         
         package_variants = data["package_variants"]
         
@@ -196,7 +222,9 @@ def get_packages_by_family(
         
         for variant in package_variants:
             variant_name = variant["name"]
+            variant_code = variant["package_variant_code"]
             print(f" Variant {variant_number}: {variant_name}")
+            print(f" Code: {variant_code}")
             for option in variant["package_options"]:
                 option_name = option["name"]
                 
@@ -211,12 +239,17 @@ def get_packages_by_family(
                 
                 # print(json.dumps(option, indent=2))
                 
-                print(f"{option_number}. {option_name} - Rp {option['price']}")
+                print(f"   {option_number}. {option_name} - Rp {option['price']}")
                 
                 option_number += 1
+            
+            if variant_number < len(package_variants):
+                print("-------------------------------------------------------")
             variant_number += 1
+        print("-------------------------------------------------------")
 
         print("00. Kembali ke menu utama")
+        print("-------------------------------------------------------")
         pkg_choice = input("Pilih paket (nomor): ")
         if pkg_choice == "00":
             in_package_menu = False
