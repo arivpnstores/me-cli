@@ -1,7 +1,7 @@
 import json
 import sys
 from app.service.auth import AuthInstance
-from app.client.engsel import get_family, get_package, get_addons, purchase_package, send_api_request
+from app.client.engsel import get_family, get_family_v2, get_package, get_addons, get_package_details, purchase_package, send_api_request
 from app.service.bookmark import BookmarkInstance
 from app.client.purchase import show_qris_payment, settlement_bounty
 from app.client.ewallet import show_multipayment
@@ -39,9 +39,21 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
     ts_to_sign = package["timestamp"]
     payment_for = package["package_family"]["payment_for"]
     
+    payment_items = [
+        PaymentItem(
+            item_code=package_option_code,
+            product_type="",
+            item_price=price,
+            item_name=f"{variant_name} {option_name}".strip(),
+            tax=0,
+            token_confirmation=token_confirmation,
+        )
+    ]
+    
     print("-------------------------------------------------------")
     print(f"Nama: {title}")
     print(f"Harga: Rp {price}")
+    print(f"Payment For: {payment_for}")
     print(f"Masa Aktif: {validity}")
     print(f"Point: {package['package_option']['point']}")
     print(f"Plan Type: {package['package_family']['plan_type']}")
@@ -52,6 +64,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         for benefit in benefits:
             print("-------------------------------------------------------")
             print(f" Name: {benefit['name']}")
+            print(f"  Item id: {benefit['item_id']}")
             data_type = benefit['data_type']
             if data_type == "VOICE" and benefit['total'] > 0:
                 print(f"  Total: {benefit['total']/60} menit")
@@ -79,6 +92,36 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
                 print("  Unlimited: Yes")
     print("-------------------------------------------------------")
     addons = get_addons(api_key, tokens, package_option_code)
+    
+
+    bonuses = addons.get("bonuses", [])
+    
+    # Pick 1st bonus if available, need more testing
+    # if len(bonuses) > 0:
+    #     payment_items.append(
+    #         PaymentItem(
+    #             item_code=bonuses[0]["package_option_code"],
+    #             product_type="",
+    #             item_price=0,
+    #             item_name=bonuses[0]["name"],
+    #             tax=0,
+    #             token_confirmation="",
+    #         )
+    #     )
+    
+    # Pick all bonuses, need more testing
+    # for bonus in bonuses:
+    #     payment_items.append(
+    #         PaymentItem(
+    #             item_code=bonus["package_option_code"],
+    #             product_type="",
+    #             item_price=0,
+    #             item_name=bonus["name"],
+    #             tax=0,
+    #             token_confirmation="",
+    #         )
+    #     )
+
     print(f"Addons:\n{json.dumps(addons, indent=2)}")
     print("-------------------------------------------------------")
     print(f"SnK MyXL:\n{detail}")
@@ -90,6 +133,10 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         print("1. Beli dengan Pulsa")
         print("2. Beli dengan E-Wallet")
         print("3. Bayar dengan QRIS")
+        
+        # Sometimes payment_for is empty, so we set default to BUY_PACKAGE
+        if payment_for == "":
+            payment_for = "BUY_PACKAGE"
         
         if payment_for == "REDEEM_VOUCHER":
             print("4. Ambil sebagai bonus (jika tersedia)")
@@ -123,15 +170,10 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
             settlement_balance(
                 api_key,
                 tokens,
-                [PaymentItem(
-                    item_code=package_option_code,
-                    product_type="",
-                    item_price=price,
-                    item_name=option_name,
-                    tax=0,
-                    token_confirmation=token_confirmation,
-                )],
-                ask_overwrite=True
+                payment_items,
+                payment_for,
+                True,
+                amount_used="first"
             )
             input("Silahkan cek hasil pembelian di aplikasi MyXL. Tekan Enter untuk kembali.")
             return True
@@ -140,14 +182,10 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
             show_multipayment_v2(
                 api_key,
                 tokens,
-                [PaymentItem(
-                    item_code=package_option_code,
-                    product_type="",
-                    item_price=price,
-                    item_name=option_name,
-                    tax=0,
-                    token_confirmation=token_confirmation,
-                )]
+                payment_items,
+                payment_for,
+                True,
+                amount_used="first"
             )
             input("Silahkan lakukan pembayaran & cek hasil pembelian di aplikasi MyXL. Tekan Enter untuk kembali.")
             return True
@@ -156,14 +194,43 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
             show_qris_payment_v2(
                 api_key,
                 tokens,
-                [PaymentItem(
-                    item_code=package_option_code,
+                payment_items,
+                payment_for,
+                True,
+                amount_used="first"
+            )
+            input("Silahkan lakukan pembayaran & cek hasil pembelian di aplikasi MyXL. Tekan Enter untuk kembali.")
+            return True
+        elif choice == '9':
+            # Decoy
+            pd = get_package_details(
+                api_key,
+                tokens,
+                "5d63dddd-4f90-4f4c-8438-2f005c20151f",
+                "5b59c55b-0dc7-4f34-a6e9-6afa233ad53b",
+                6,
+                False,
+                "NONE",
+            )
+            
+            payment_items.append(
+                PaymentItem(
+                    item_code=pd["package_option"]["package_option_code"],
                     product_type="",
-                    item_price=price,
-                    item_name=option_name,
+                    item_price=pd["package_option"]["price"],
+                    item_name=pd["package_option"]["name"],
                     tax=0,
-                    token_confirmation=token_confirmation,
-                )]
+                    token_confirmation=pd["token_confirmation"],
+                )
+            )
+
+            show_qris_payment_v2(
+                api_key,
+                tokens,
+                payment_items,
+                payment_for,
+                True,
+                amount_used=""
             )
             input("Silahkan lakukan pembayaran & cek hasil pembelian di aplikasi MyXL. Tekan Enter untuk kembali.")
             return True
@@ -185,8 +252,8 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
 
 def get_packages_by_family(
     family_code: str,
-    is_enterprise: bool = False,
-    migration_type: str = "NONE"
+    is_enterprise: bool | None = None,
+    migration_type: str | None = None
 ):
     api_key = AuthInstance.api_key
     tokens = AuthInstance.get_active_tokens()
@@ -197,7 +264,14 @@ def get_packages_by_family(
     
     packages = []
     
-    data = get_family(api_key, tokens, family_code, is_enterprise, migration_type)
+    # data = get_family(api_key, tokens, family_code, is_enterprise, migration_type)
+    data = get_family_v2(
+        api_key,
+        tokens,
+        family_code,
+        is_enterprise,
+        migration_type
+    )
     if not data:
         print("Failed to load family data.")
         return None    
@@ -209,7 +283,7 @@ def get_packages_by_family(
         print(f"Family Name: {data['package_family']['name']}")
         print(f"Family Code: {family_code}")
         print(f"Family Type: {data['package_family']['package_family_type']}")
-        print(f"Enterprise: {'Yes' if is_enterprise else 'No'}")
+        # print(f"Enterprise: {'Yes' if is_enterprise else 'No'}")
         print(f"Variant Count: {len(data['package_variants'])}")
         print("-------------------------------------------------------")
         print("Paket Tersedia")

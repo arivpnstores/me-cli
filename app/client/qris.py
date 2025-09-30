@@ -14,7 +14,9 @@ def settlement_qris_v2(
     api_key: str,
     tokens: dict,
     items: list[PaymentItem],
-    ask_overwrite: bool = True,
+    payment_for: str,
+    ask_overwrite: bool,
+    amount_used: str = ""
 ):  
     token_confirmation = items[0]["token_confirmation"]
     payment_targets = ""
@@ -24,6 +26,8 @@ def settlement_qris_v2(
         payment_targets += item["item_code"]
     
     amount_int = items[-1]["item_price"]
+    if amount_used == "first":
+        amount_int = items[0]["item_price"]
     
     # Overwrite
     if ask_overwrite:
@@ -35,6 +39,8 @@ def settlement_qris_v2(
             except ValueError:
                 print("Invalid overwrite input, using original price.")
                 # return None
+    
+    intercept_page(api_key, tokens, items[0]["item_code"], False)
     
     # Get payment methods
     payment_path = "payments/api/v8/payment-methods-option"
@@ -68,7 +74,7 @@ def settlement_qris_v2(
         "can_trigger_rating": False,
         "total_discount": 0,
         "coupon": "",
-        "payment_for": "BUY_PACKAGE",
+        "payment_for": payment_for,
         "topup_number": "",
         "is_enterprise": False,
         "autobuy": {
@@ -113,7 +119,8 @@ def settlement_qris_v2(
             ts_to_sign,
             payment_targets,
             token_payment,
-            "QRIS"
+            "QRIS",
+            payment_for
         )
     
     headers = {
@@ -173,13 +180,17 @@ def show_qris_payment_v2(
     api_key: str,
     tokens: dict,
     items: list[PaymentItem],
-    ask_overwrite: bool = True,
+    payment_for: str,
+    ask_overwrite: bool,
+    amount_used: str = ""
 ):  
     transaction_id = settlement_qris_v2(
         api_key,
         tokens,
         items,
-        ask_overwrite
+        payment_for,
+        ask_overwrite,
+        amount_used,
     )
     
     if not transaction_id:

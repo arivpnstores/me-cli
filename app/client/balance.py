@@ -8,7 +8,7 @@ import uuid
 
 import requests
 from app.client.encrypt import API_KEY, build_encrypted_field, decrypt_xdata, encryptsign_xdata, get_x_signature_payment, java_like_timestamp
-from app.client.engsel import BASE_API_URL, UA, send_api_request
+from app.client.engsel import BASE_API_URL, UA, intercept_page, send_api_request
 from app.type_dict import PaymentItem
 
 
@@ -16,7 +16,9 @@ def settlement_balance(
     api_key: str,
     tokens: dict,
     items: list[PaymentItem],
-    ask_overwrite: bool = True,
+    payment_for: str,
+    ask_overwrite: bool,
+    amount_used: str = ""
 ):
     token_confirmation = items[0]["token_confirmation"]
     payment_targets = ""
@@ -26,6 +28,9 @@ def settlement_balance(
         payment_targets += item["item_code"]
     
     amount_int = items[-1]["item_price"]
+    
+    if amount_used == "first":
+        amount_int = items[0]["item_price"]
     
     # Overwrite
     if ask_overwrite:
@@ -37,6 +42,8 @@ def settlement_balance(
             except ValueError:
                 print("Invalid overwrite input, using original price.")
                 # return None
+    
+    intercept_page(api_key, tokens, items[0]["item_code"], False)
     
     # Get payment methods
     payment_path = "payments/api/v8/payment-methods-option"
@@ -89,7 +96,7 @@ def settlement_balance(
         "akrab_parent_alias": "",
         "referral_unique_code": "",
         "coupon": "",
-        "payment_for": "BUY_PACKAGE",
+        "payment_for": payment_for,
         "with_upsell": False,
         "topup_number": "",
         "stage_token": "",
@@ -146,7 +153,8 @@ def settlement_balance(
                 ts_to_sign,
                 payment_targets,
                 token_payment,
-                "BALANCE"
+                "BALANCE",
+                payment_for
             )
     
     headers = {
