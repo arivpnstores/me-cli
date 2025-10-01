@@ -1,3 +1,4 @@
+# DOR XL
 CLI client for a certain Indonesian mobile internet service provider.
 
 # How to get API Key
@@ -21,13 +22,7 @@ cd me-cli && source venv/bin/activate && python main.py
 ```
 7. Input your API key when prompted
 
-# Info
 # UPDATE
 ```
 git pull --rebase
 ```
-## PS for Certain Indonesian mobile internet service provider
-
-Instead of just delisting the package from the app, ensure the user cannot purchase it.
-What's the point of strong client side security when the server don't enforce it?
-
