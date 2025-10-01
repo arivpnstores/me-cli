@@ -1,4 +1,4 @@
-# DOR XL
+# MINYAK ENGSEL
 CLI client for a certain Indonesian mobile internet service provider.
 
 # How to get API Key
