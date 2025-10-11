@@ -1,46 +1,27 @@
-# MYnyak Engsel
-
-![banner](bnr.png)
-
+# MINYAK ENGSEL
 CLI client for a certain Indonesian mobile internet service provider.
 
 # How to get API Key
-Chat telegram bot [@fykxt_bot](https://t.me/fykxt_bot) with message `/viewkey`. Copy the API key.
+Chat telegram bot [@fykxt_bot](https://t.me/fykxt_bot) with message /viewkey. Copy the API key.
 
-# How to run with TERMUX
-1. Update & Upgrade Termux
+# Install On TERMUX
+```bash
+pkg update -y && pkg upgrade -y && pkg install curl -y && curl -L -o setup.sh https://raw.githubusercontent.com/arivpnstores/me-cli/main/setup.sh && chmod +x setup.sh && ./setup.sh
 ```
-pkg update && pkg upgrade -y
+# Restart On TERMUX 
+```bash
+cd me-cli && python main.py
 ```
-2. Install Git
+# Install On VPS & LINUX
+```bash
+apt update -y && apt upgrade -y && apt install curl -y && curl -L -o setup.sh https://raw.githubusercontent.com/arivpnstores/me-cli/main/setupVPS.sh && chmod +x setup.sh && ./setup.sh
 ```
-pkg install git -y
-```
-3. Clone this repo
-```
-git clone https://github.com/purplemashu/me-cli
-```
-4. Open the folder
-```
-cd me-cli
-```
-5. Setup
-```
-bash setup.sh
-```
-6. Run the script
-```
-python main.py
+# Restart On VPS & LINUX 
+```bash
+cd me-cli && source venv/bin/activate && python main.py
 ```
 7. Input your API key when prompted
 
-# Info
-
-## PS for Certain Indonesian mobile internet service provider
-
-Instead of just delisting the package from the app, ensure the user cannot purchase it.
-What's the point of strong client side security when the server don't enforce it?
-
-## Contact
-
-contact@mashu.lol
+# UPDATE
+```bash
+git pull --rebase
