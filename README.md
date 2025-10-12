@@ -25,3 +25,8 @@ cd me-cli && source venv/bin/activate && git pull --rebase && python main.py
 # UPDATE
 ```bash
 git pull --rebase
+```
+# HAPUS DULU JIKA ERORR
+```bash
+cd && rm -rf me-cli
+```
