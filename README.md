@@ -18,7 +18,7 @@ apt update -y && apt upgrade -y && apt install curl -y && curl -L -o setup.sh ht
 ```
 # Restart On VPS & LINUX 
 ```bash
-cd me-cli && source venv/bin/activate && git pull --rebase && python main.py
+cd && cd me-cli && source venv/bin/activate && git pull --rebase && python main.py
 ```
 7. Input your API key when prompted
 
