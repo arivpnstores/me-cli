@@ -10,7 +10,7 @@ pkg update -y && pkg upgrade -y && pkg install curl -y && curl -L -o setup.sh ht
 ```
 # Restart On TERMUX 
 ```bash
-cd me-cli && python main.py
+cd && cd me-cli && git pull --rebase && python main.py
 ```
 # Install On VPS & LINUX
 ```bash
@@ -18,7 +18,7 @@ apt update -y && apt upgrade -y && apt install curl -y && curl -L -o setup.sh ht
 ```
 # Restart On VPS & LINUX 
 ```bash
-cd me-cli && source venv/bin/activate && python main.py
+cd me-cli && source venv/bin/activate && git pull --rebase && python main.py
 ```
 7. Input your API key when prompted
 
