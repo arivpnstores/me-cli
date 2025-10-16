@@ -1,5 +1,5 @@
+import requests, time
 from random import randint
-import requests
 from app.client.engsel import get_family, get_package_details
 from app.menus.util import pause
 from app.service.auth import AuthInstance
@@ -107,7 +107,7 @@ def purchase_by_family(
                     item_code=target_package_detail["package_option"]["package_option_code"],
                     product_type="",
                     item_price=target_package_detail["package_option"]["price"],
-                    item_name=str(randint(1000, 9999)) + target_package_detail["package_option"]["name"],
+                    item_name=str(randint(1000, 9999)) + " " + target_package_detail["package_option"]["name"],
                     tax=0,
                     token_confirmation=target_package_detail["token_confirmation"],
                 )
@@ -119,7 +119,7 @@ def purchase_by_family(
                         item_code=decoy_package_detail["package_option"]["package_option_code"],
                         product_type="",
                         item_price=decoy_package_detail["package_option"]["price"],
-                        item_name=str(randint(1000, 9999)) + decoy_package_detail["package_option"]["name"],
+                        item_name=str(randint(1000, 9999)) + " " + decoy_package_detail["package_option"]["name"],
                         tax=0,
                         token_confirmation=decoy_package_detail["token_confirmation"],
                     )
@@ -196,6 +196,7 @@ def purchase_n_times(
     variant_code: str,
     option_order: int,
     use_decoy: bool,
+    delay_seconds: int = 0,
     pause_on_success: bool = False,
     token_confirmation_idx: int = 0,
 ):
@@ -301,7 +302,7 @@ def purchase_n_times(
                 item_code=target_package_detail["package_option"]["package_option_code"],
                 product_type="",
                 item_price=target_package_detail["package_option"]["price"],
-                item_name=str(randint(1000, 9999)) + target_package_detail["package_option"]["name"],
+                item_name=str(randint(1000, 9999)) + " " + target_package_detail["package_option"]["name"],
                 tax=0,
                 token_confirmation=target_package_detail["token_confirmation"],
             )
@@ -313,7 +314,7 @@ def purchase_n_times(
                     item_code=decoy_package_detail["package_option"]["package_option_code"],
                     product_type="",
                     item_price=decoy_package_detail["package_option"]["price"],
-                    item_name=str(randint(1000, 9999)) + decoy_package_detail["package_option"]["name"],
+                    item_name=str(randint(1000, 9999)) + " " + decoy_package_detail["package_option"]["name"],
                     tax=0,
                     token_confirmation=decoy_package_detail["token_confirmation"],
                 )
@@ -373,6 +374,11 @@ def purchase_n_times(
             print(f"Exception occurred while creating order: {e}")
             res = None
         print("-------------------------------------------------------")
+
+        if delay_seconds > 0 and i < n - 1:
+            print(f"Waiting for {delay_seconds} seconds before next purchase...")
+            time.sleep(delay_seconds)
+
     print(f"Total successful purchases {len(successful_purchases)}/{n} for:\nFamily: {family_name}\nVariant: {target_variant['name']}\nOption: {option_order}. {option_name} - {option_price}")
     if len(successful_purchases) > 0:
         print("-------------------------------------------------------")
