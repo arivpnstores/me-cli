@@ -4,6 +4,7 @@ import sys
 import requests
 from app.service.auth import AuthInstance
 from app.client.engsel import get_family, get_package, get_addons, get_package_details, send_api_request
+from app.client.engsel2 import unsubscribe
 from app.service.bookmark import BookmarkInstance
 from app.client.purchase import settlement_bounty, settlement_loyalty
 from app.menus.util import clear_screen, pause, display_html
@@ -137,9 +138,9 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
         print("3. Bayar dengan QRIS")
         print("4. Pulsa + Decoy XCP")
         print("5. Pulsa + Decoy XCP V2")
-        print("6. Pulsa N kali")
-        print("7. QRIS + Decoy Edu")
-        
+        print("6. QRIS + Decoy Edu")
+        print("7. Pulsa N kali")
+
         # Sometimes payment_for is empty, so we set default to BUY_PACKAGE
         if payment_for == "":
             payment_for = "BUY_PACKAGE"
@@ -239,7 +240,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
                 api_key,
                 tokens,
                 payment_items,
-                "BUY_PACKAGE",
+                payment_for,
                 False,
                 overwrite_amount,
             )
@@ -255,7 +256,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
                         api_key,
                         tokens,
                         payment_items,
-                        "BUY_PACKAGE",
+                        payment_for,
                         False,
                         valid_amount,
                     )
@@ -266,7 +267,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
             pause()
             return True
         elif choice == '5':
-            # Balance; Decoy XCP V2
+            # Balance; Decoy XCP V2: Use token confirmation from decoy package
             url = "https://me.mashu.lol/pg-decoy-xcp.json"
             
             response = requests.get(url, timeout=30)
@@ -302,10 +303,10 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
                 api_key,
                 tokens,
                 payment_items,
-                "BUY_PACKAGE",
+                "🤫",
                 False,
                 overwrite_amount,
-                token_confirmation_idx=-1
+                token_confirmation_idx=1
             )
             
             if res and res.get("status", "") != "SUCCESS":
@@ -331,44 +332,6 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
             pause()
             return True
         elif choice == '6':
-            use_decoy_for_n_times = input("Use decoy package? (y/n): ").strip().lower() == 'y'
-            n_times_str = input("Enter number of times to purchase (e.g., 3): ").strip()
-
-            delay_seconds_str = input("Enter delay between purchases in seconds (e.g., 25): ").strip()
-            if not delay_seconds_str.isdigit():
-                delay_seconds_str = "0"
-
-            try:
-                n_times = int(n_times_str)
-                if n_times < 1:
-                    raise ValueError("Number must be at least 1.")
-            except ValueError:
-                print("Invalid number entered. Please enter a valid integer.")
-                pause()
-                continue
-            purchase_n_times(
-                n_times,
-                family_code=package.get("package_family", {}).get("package_family_code",""),
-                variant_code=package.get("package_detail_variant", {}).get("package_variant_code",""),
-                option_order=option_order,
-                use_decoy=use_decoy_for_n_times,
-                delay_seconds=int(delay_seconds_str),
-                pause_on_success=False,
-            )
-                
-        elif choice.lower() == 'b':
-            settlement_bounty(
-                api_key=api_key,
-                tokens=tokens,
-                token_confirmation=token_confirmation,
-                ts_to_sign=ts_to_sign,
-                payment_target=package_option_code,
-                price=price,
-                item_name=variant_name
-            )
-            input("Silahkan lakukan pembayaran & cek hasil pembelian di aplikasi MyXL. Tekan Enter untuk kembali.")
-            return True
-        elif choice == '7':
             # QRIS; Decoy Edu
             url = "https://me.mashu.lol/pg-decoy-edu.json"
             
@@ -403,7 +366,7 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
             print("-"*55)
             print(f"Harga Paket Utama: Rp {price}")
             print(f"Harga Paket Decoy: Rp {decoy_package_detail['package_option']['price']}")
-            print(f"Silahkan sesuaikan amount (trial & error)")
+            print("Silahkan sesuaikan amount (trial & error)")
             print("-"*55)
 
             show_qris_payment(
@@ -415,6 +378,43 @@ def show_package_details(api_key, tokens, package_option_code, is_enterprise, op
                 token_confirmation_idx=1
             )
             
+            input("Silahkan lakukan pembayaran & cek hasil pembelian di aplikasi MyXL. Tekan Enter untuk kembali.")
+            return True
+        elif choice == '7':
+            use_decoy_for_n_times = input("Use decoy package? (y/n): ").strip().lower() == 'y'
+            n_times_str = input("Enter number of times to purchase (e.g., 3): ").strip()
+
+            delay_seconds_str = input("Enter delay between purchases in seconds (e.g., 25): ").strip()
+            if not delay_seconds_str.isdigit():
+                delay_seconds_str = "0"
+
+            try:
+                n_times = int(n_times_str)
+                if n_times < 1:
+                    raise ValueError("Number must be at least 1.")
+            except ValueError:
+                print("Invalid number entered. Please enter a valid integer.")
+                pause()
+                continue
+            purchase_n_times(
+                n_times,
+                family_code=package.get("package_family", {}).get("package_family_code",""),
+                variant_code=package.get("package_detail_variant", {}).get("package_variant_code",""),
+                option_order=option_order,
+                use_decoy=use_decoy_for_n_times,
+                delay_seconds=int(delay_seconds_str),
+                pause_on_success=False,
+            )
+        elif choice.lower() == 'b':
+            settlement_bounty(
+                api_key=api_key,
+                tokens=tokens,
+                token_confirmation=token_confirmation,
+                ts_to_sign=ts_to_sign,
+                payment_target=package_option_code,
+                price=price,
+                item_name=variant_name
+            )
             input("Silahkan lakukan pembayaran & cek hasil pembelian di aplikasi MyXL. Tekan Enter untuk kembali.")
             return True
         elif choice.lower() == 'l':
@@ -572,6 +572,9 @@ def fetch_my_packages():
         quota_name = quota["name"]
         family_code = "N/A"
         
+        product_subscription_type = quota.get("product_subscription_type", "")
+        product_domain = quota.get("product_domain", "")
+        
         benefit_infos = []
         benefits = quota.get("benefits", [])
         if len(benefits) > 0:
@@ -645,14 +648,49 @@ def fetch_my_packages():
         
         my_packages.append({
             "number": num,
+            "name": quota_name,
             "quota_code": quota_code,
+            "product_subscription_type": product_subscription_type,
+            "product_domain": product_domain,
         })
         
         num += 1
     
-    print("Rebuy package? Input package number to rebuy, or '00' to back.")
+    print("Input package number to view detail.")
+    print("Input del <package number> to unsubscribe from a package.")
+    print("Input 00 to return to main menu.")
     choice = input("Choice: ")
     if choice == "00":
+        return None
+    if choice.startswith("del "):
+        del_parts = choice.split(" ")
+        if len(del_parts) != 2 or not del_parts[1].isdigit():
+            print("Invalid input for delete command.")
+            pause()
+            return None
+        del_number = int(del_parts[1])
+        del_pkg = next((pkg for pkg in my_packages if pkg["number"] == del_number), None)
+        if not del_pkg:
+            print("Package not found for deletion.")
+            pause()
+            return None
+        confirm = input(f"Are you sure you want to unsubscribe from package  {del_number}. {del_pkg['name']}? (y/n): ")
+        if confirm.lower() == 'y':
+            print(f"Unsubscribing from package number {del_pkg['name']}...")
+            success = unsubscribe(
+                api_key,
+                tokens,
+                del_pkg["quota_code"],
+                del_pkg["product_subscription_type"],
+                del_pkg["product_domain"]
+            )
+            if success:
+                print("Successfully unsubscribed from the package.")
+            else:
+                print("Failed to unsubscribe from the package.")
+        else:
+            print("Unsubscribe cancelled.")
+        pause()
         return None
     selected_pkg = next((pkg for pkg in my_packages if str(pkg["number"]) == choice), None)
     
