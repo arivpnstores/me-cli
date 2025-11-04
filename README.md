@@ -6,7 +6,7 @@ Chat telegram bot [@fykxt_bot](https://t.me/fykxt_bot) with message /viewkey. Co
 
 # Install On TERMUX
 ```bash
-pkg update -y && pkg upgrade -y && pkg install curl -y && curl -L -o setup.sh https://raw.githubusercontent.com/arivpnstores/me-cli/main/setup.sh && chmod +x setup.sh && ./setup.sh
+cd && pkg update -y && pkg upgrade -y && pkg install curl -y && curl -L -o setup.sh https://raw.githubusercontent.com/arivpnstores/me-cli/main/setup.sh && chmod +x setup.sh && ./setup.sh
 ```
 # Restart On TERMUX 
 ```bash
@@ -14,7 +14,7 @@ cd && cd me-cli && git pull --rebase && python main.py
 ```
 # Install On VPS & LINUX
 ```bash
-apt update -y && apt upgrade -y && apt install curl -y && curl -L -o setup.sh https://raw.githubusercontent.com/arivpnstores/me-cli/main/setupVPS.sh && chmod +x setup.sh && ./setup.sh
+cd && apt update -y && apt upgrade -y && apt install curl -y && curl -L -o setup.sh https://raw.githubusercontent.com/arivpnstores/me-cli/main/setupVPS.sh && chmod +x setup.sh && ./setup.sh
 ```
 # Restart On VPS & LINUX 
 ```bash
