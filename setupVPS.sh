@@ -15,7 +15,8 @@ apt update -y && apt upgrade -y
 apt install -y git curl wget build-essential \
     libssl-dev zlib1g-dev libncurses5-dev libnss3-dev \
     libreadline-dev libffi-dev libsqlite3-dev \
-    software-properties-common ca-certificates gnupg lsb-release
+    software-properties-common ca-certificates gnupg lsb-release \
+    python3 python3-pip python3.8-venv python3.8-dev python3-pillow
 
 # Clone repository
 cd ~
@@ -26,19 +27,11 @@ else
 fi
 cd me-cli
 
-# Hapus paket lama pillow
-apt remove -y python3-pil python3-pil.imagetk 2>/dev/null || true
-apt install -y python3 python3-pip python3-pillow
-
-# Tambahkan repo deadsnakes jika tersedia
-if ! grep -q "deadsnakes" /etc/apt/sources.list /etc/apt/sources.list.d/* 2>/dev/null; then
-    add-apt-repository ppa:deadsnakes/ppa -y || true
-    apt update -y
-fi
-
-# Coba install Python 3.11 dari repo
-if ! apt install -y python3.11 python3.11-venv python3.11-dev; then
-    echo "⚠️ Repo tidak menyediakan Python 3.11 — akan di-compile manual"
+# Cek Python 3.11, compile manual kalau tidak ada
+if ! command -v python3.11 >/dev/null 2>&1; then
+    echo "⚠️ Python 3.11 tidak ditemukan, compile manual..."
+    apt install -y build-essential libssl-dev zlib1g-dev \
+        libncurses5-dev libnss3-dev libreadline-dev libffi-dev libsqlite3-dev wget
     cd /usr/src
     wget https://www.python.org/ftp/python/3.11.9/Python-3.11.9.tgz
     tar -xzf Python-3.11.9.tgz
@@ -49,16 +42,21 @@ if ! apt install -y python3.11 python3.11-venv python3.11-dev; then
     cd ~/me-cli
 fi
 
-# Buat virtual environment
-apt install python3.8-venv
-python3.11 -m venv venv
+# Buat virtual environment dengan Python 3.11 fallback ke 3.8
+if command -v python3.11 >/dev/null 2>&1; then
+    python3.11 -m venv venv
+else
+    python3 -m venv venv
+fi
+
 source venv/bin/activate
 
-# Upgrade pip, wheel, setuptools
+# Pakai pip resmi PyPI supaya requests==2.32.5 bisa didapat
+pip config set global.index-url https://pypi.org/simple
 pip install --upgrade pip setuptools wheel
 
 # Install dependencies
-pip install -r requirements.txt
+pip install -r requirements.txt || echo "⚠️ Beberapa package gagal, install manual bila perlu"
 
 # Jalankan program
 python3 main.py
