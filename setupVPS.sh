@@ -50,6 +50,7 @@ if ! apt install -y python3.11 python3.11-venv python3.11-dev; then
 fi
 
 # Buat virtual environment
+apt install python3.8-venv
 python3.11 -m venv venv
 source venv/bin/activate
 
