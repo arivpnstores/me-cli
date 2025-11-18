@@ -3,56 +3,55 @@ set -e
 
 echo "🔍 Mengecek versi Ubuntu..."
 UBU_VERSION=$(lsb_release -rs)
-
 echo "➡️ Ubuntu versi: $UBU_VERSION"
 
+# Update & Upgrade
 apt update -y && apt upgrade -y
 
-# Install essential packages
-apt install -y git software-properties-common
+# Install dependencies dasar
+apt install -y git software-properties-common build-essential \
+  zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev \
+  libreadline-dev libffi-dev libsqlite3-dev wget
 
-# Clone jika belum ada
+# Clone repo jika belum ada
 if [ ! -d "me-cli" ]; then
   git clone https://github.com/purplemashu/me-cli
 fi
-
 cd me-cli
 
 # -------------------------------
-#   BAGIAN UBUNTU 20.04
+# Compile Python 3.11 dari source
 # -------------------------------
-if [[ "$UBU_VERSION" == "20.04" ]]; then
-  echo "🟦 Detected Ubuntu 20.04 → install Python 3.11 via PPA..."
+echo "🐍 Download Python 3.11..."
+cd /usr/src
+wget https://www.python.org/ftp/python/3.11.7/Python-3.11.7.tgz
+tar xzf Python-3.11.7.tgz
+cd Python-3.11.7
 
-  add-apt-repository ppa:deadsnakes/ppa -y
-  apt update -y
+echo "⚙️ Compile Python 3.11..."
+./configure --enable-optimizations
+make -j$(nproc)
+make altinstall
 
-  apt install -y python3.11 python3.11-venv python3.11-dev python3-pil python3-pil.imagetk
-
-# -------------------------------
-#   BAGIAN UBUNTU 24.04 / 22.04
-# -------------------------------
-else
-  echo "🟩 Detected Ubuntu 22.04 atau 24.04 → Python 3.11 sudah tersedia!"
-
-  apt install -y python3.11 python3.11-venv python3.11-dev python3-pil python3-pil.imagetk
-fi
-
-# Cek versi Python
+# Cek versi Python 3.11
 python3.11 --version
 
-# Setup Virtual Environment
+# Kembali ke folder me-cli
+cd ~/me-cli
+
+# Buat virtual environment
 echo "📦 Membuat virtual environment..."
 python3.11 -m venv venv
-
-echo "🚀 Mengaktifkan virtual environment..."
 source venv/bin/activate
 
-echo "⬆️ Upgrade pip..."
+# Upgrade pip & install requirements
 pip install --upgrade pip
 
-echo "📥 Install requirements..."
+# Jika ada versi requests==2.32.5 di requirements.txt, ganti dulu
+sed -i 's/requests==2.32.5/requests==2.32.4/' requirements.txt
+
 pip install -r requirements.txt
 
+# Jalankan main.py
 echo "▶️ Menjalankan main.py ..."
-python main.py
+python3.11 main.py
