@@ -1,4 +1,4 @@
-# MINYAK ENGSEL
+# MINYAK ENGSEL MOD
 CLI client for a certain Indonesian mobile internet service provider.
 
 # How to get API Key
@@ -12,6 +12,7 @@ cd && pkg update -y && pkg upgrade -y && pkg install curl -y && curl -L -o setup
 ```bash
 cd && cd me-cli && git pull --rebase && python main.py
 ```
+-----------------------------------------------------------------------------------------------------------------------------------------
 # Install On VPS & LINUX
 ```bash
 cd && apt update -y && apt upgrade -y && apt install curl -y && curl -L -o setup.sh https://raw.githubusercontent.com/arivpnstores/me-cli/main/setupVPS.sh && chmod +x setup.sh && ./setup.sh
