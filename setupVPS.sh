@@ -15,7 +15,7 @@ apt install -y git software-properties-common build-essential \
 
 # Clone repo jika belum ada
 if [ ! -d "me-cli" ]; then
-  git clone https://github.com/purplemashu/me-cli
+  git clone https://github.com/purplemashu/me-cli-sunset
 fi
 cd me-cli
 
