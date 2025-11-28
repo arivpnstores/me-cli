@@ -6,5 +6,4 @@ pkg install python-pillow -y
 git clone https://github.com/purplemashu/me-cli-sunset
 cd me-cli-sunset
 pip install -r requirements.txt
-nano .env
 python main.py
