@@ -4,6 +4,6 @@ pkg install git -y
 pkg install python -y
 pkg install python-pillow -y
 git clone https://github.com/purplemashu/me-cli-sunset
-cd me-cli
+cd me-cli-sunset
 pip install -r requirements.txt
 python main.py
