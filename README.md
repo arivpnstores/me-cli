@@ -24,7 +24,6 @@ cd && apt update -y && apt upgrade -y && apt install curl -y && curl -L -o setup
 ```bash
 cd && cd me-cli-sunset && source venv/bin/activate && git pull --rebase && python main.py
 ```
-7. Input your API key when prompted
 
 # UPDATE
 ```bash
@@ -32,5 +31,5 @@ git pull --rebase
 ```
 # HAPUS DULU JIKA ERORR
 ```bash
-cd && rm -rf me-cli
+cd && rm -rf me-cli-sunset
 ```
