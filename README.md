@@ -3,6 +3,9 @@ CLI client for a certain Indonesian mobile internet service provider.
 
 # How to get API Key
 open website https://rentry.co/me-sunset with message. Copy the API key.
+```bash
+nano .env
+```
 
 # TERMUX
 ```bash
