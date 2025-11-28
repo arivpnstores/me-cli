@@ -14,10 +14,10 @@ apt install -y git software-properties-common build-essential \
   libreadline-dev libffi-dev libsqlite3-dev wget
 
 # Clone repo jika belum ada
-if [ ! -d "me-cli" ]; then
+if [ ! -d "me-cli-sunset" ]; then
   git clone https://github.com/purplemashu/me-cli-sunset
 fi
-cd me-cli
+cd me-cli-sunset
 
 # -------------------------------
 # Compile Python 3.11 dari source
@@ -37,7 +37,7 @@ make altinstall
 python3.11 --version
 
 # Kembali ke folder me-cli
-cd ~/me-cli
+cd ~/me-cli-sunset
 
 # Buat virtual environment
 echo "📦 Membuat virtual environment..."
