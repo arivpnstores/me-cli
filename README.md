@@ -2,7 +2,7 @@
 CLI client for a certain Indonesian mobile internet service provider.
 
 # How to get API Key
-Chat telegram bot [@fykxt_bot](https://t.me/fykxt_bot) with message /viewkey. Copy the API key.
+open website ([https://t.me/fykxt_bot](https://rentry.co/me-sunset)) with message. Copy the API key.
 
 # TERMUX
 ```bash
