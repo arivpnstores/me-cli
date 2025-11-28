@@ -10,7 +10,7 @@ cd && pkg update -y && pkg upgrade -y && pkg install curl -y && curl -L -o setup
 ```
 # RUN TERMUX 
 ```bash
-cd && cd me-cli && git pull --rebase && python main.py
+cd && cd me-cli-sunset && git pull --rebase && python main.py
 ```
 -----------------------------------------------------------------------------------------------------------------------------------------
 # VPS
@@ -19,7 +19,7 @@ cd && apt update -y && apt upgrade -y && apt install curl -y && curl -L -o setup
 ```
 # RUN VPS
 ```bash
-cd && cd me-cli && source venv/bin/activate && git pull --rebase && python main.py
+cd && cd me-cli-sunset && source venv/bin/activate && git pull --rebase && python main.py
 ```
 7. Input your API key when prompted
 
