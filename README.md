@@ -13,7 +13,7 @@ cd && pkg update -y && pkg upgrade -y && pkg install curl -y && curl -L -o setup
 ```
 # RUN TERMUX 
 ```bash
-cd && cd me-cli-sunset && git pull --rebase && python main.py
+cd && cd me-cli-sunset && python main.py
 ```
 -----------------------------------------------------------------------------------------------------------------------------------------
 # VPS
@@ -22,7 +22,7 @@ cd && apt update -y && apt upgrade -y && apt install curl -y && curl -L -o setup
 ```
 # RUN VPS
 ```bash
-cd && cd me-cli-sunset && source venv/bin/activate && git pull --rebase && python3.11 main.py
+cd && cd me-cli-sunset && source venv/bin/activate && python3.11 main.py
 ```
 
 # UPDATE
