@@ -5,8 +5,8 @@ echo "🔍 Mengecek versi Ubuntu..."
 UBU_VERSION=$(lsb_release -rs)
 echo "➡️ Ubuntu versi: $UBU_VERSION"
 
-# Update & Upgrade
-apt update -y && apt upgrade -y
+# Update
+apt update -y
 
 # Install dependencies dasar
 apt install -y git software-properties-common build-essential \
