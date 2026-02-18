@@ -50,8 +50,8 @@ pip install --upgrade pip
 # Jika ada versi requests==2.32.5 di requirements.txt, ganti dulu
 sed -i 's/requests==2.32.5/requests==2.32.4/' requirements.txt
 
-pip install -r requirements.txt
-
+#pip install -r requirements.txt
+bash setup.sh 
 # Jalankan main.py
 echo "▶️ Menjalankan main.py ..."
 python3.11 main.py
