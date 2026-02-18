@@ -15,7 +15,7 @@ apt install -y git software-properties-common build-essential \
 
 # Clone repo jika belum ada
 if [ ! -d "me-cli-sunset" ]; then
-  git clone https://github.com/purplemashu/me-cli-sunset
+  git clone https://github.com/arivpnstores/me-cli-sunset
 fi
 cd me-cli-sunset
 
