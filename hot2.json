@@ -1,0 +1,33 @@
+[
+    {
+        "name": "Masa Aktif 30 Hari",
+        "price": "Rp0",
+        "detail": "Membuat masa aktif menjadi 30 hari dari tanggal pembelian."
+        "packages": [
+            {
+                "family_name": "Akrab",
+                "family_code": "f4fd69c7-12a4-4047-a1f2-f4072a7c543e",
+                "is_enterprise": false,
+                "migration_type": "NONE",
+                "variant_name": "Akrab",
+                "variant_code": "555a091d-b1eb-43c2-925f-3da485fecf5f",
+                "option_name": "19GB for 2 Members",
+                "order": 17
+            },
+            {
+                "family_name": "",
+                "family_code": "b0a20d74-0c54-4e3b-8f3f-01e7482e50bf",
+                "is_enterprise": true,
+                "migration_type": "NONE",
+                "variant_code": "719d093f-6f8d-46a4-8390-6a0003a172ea",
+                "option_name": "",
+                "order": 4
+            }
+        ],
+        "payment_for": "BUY_PACKAGE",
+        "ask_overwrite": false,
+        "overwrite_amount": 0,
+        "token_confirmation_idx": 0,
+        "amount_idx": -1
+    }
+]
