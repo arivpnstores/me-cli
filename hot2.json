@@ -11,16 +11,16 @@
                 "migration_type": "NONE",
                 "variant_name": "Akrab",
                 "variant_code": "555a091d-b1eb-43c2-925f-3da485fecf5f",
-                "option_name": "19GB for 2 Members",
-                "order": 17
+                "option_name": "Akrab 47GB for 2 Members",
+                "order": 20
             },
             {
-                "family_name": "",
+                "family_name": "PASS",
                 "family_code": "b0a20d74-0c54-4e3b-8f3f-01e7482e50bf",
                 "is_enterprise": true,
                 "migration_type": "NONE",
                 "variant_code": "719d093f-6f8d-46a4-8390-6a0003a172ea",
-                "option_name": "",
+                "option_name": "XL PASS 1 day",
                 "order": 4
             }
         ],
