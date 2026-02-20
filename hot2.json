@@ -2,7 +2,7 @@
     {
         "name": "Masa Aktif 30 Hari",
         "price": "Rp0",
-        "detail": "Membuat masa aktif menjadi 30 hari dari tanggal pembelian."
+        "detail": "Membuat masa aktif menjadi 30 hari dari tanggal pembelian.",
         "packages": [
             {
                 "family_name": "Akrab",
